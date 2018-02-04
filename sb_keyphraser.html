@@ -149,7 +149,7 @@
 	};
 
 
-	//adds gamenumbers to lines w/o 2018, returns new allstrings array
+	//adds gamenumbers to lines w/o 2018 or 'big', returns new allstrings array
 	//adds space before except when hashtag exists
 	//does not add space after 
 	function addGamenumbers(){
@@ -158,6 +158,9 @@
 		
 		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
 			tempArray.push(allStrings[allIndex]);
+			if(allStrings[allIndex].match(/big/)){
+				continue;
+			};
 			if(allStrings[allIndex].match(/2018/)){
 				continue;
 			};
