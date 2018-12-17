@@ -7,20 +7,16 @@
 		body {
 		font-family: Sans-serif;
 		}
-
 		.output {
 		padding: 15px;
 		float: left;
 		}
-
 		.input {
 		float: left;
 		}
-
 		#form {
 		padding: 15px;
 		}
-
 		.hidden {
 		visibility: hidden;
 		}
@@ -53,21 +49,18 @@
 	<textarea class="hidden" cols="30" value="" id="gametimePhrases"></textarea>
 
 	<script>
-
 		var prefixList = ["#", "2019", ""];
 		var gamewordList = ["superbowl", "super bowl", "sb", "biggame", "big game"];
 		var gameNumbers = ["53", "liii"];
 		var identifierList = ["commercial", "ad"];
 		var keywordList = [];
 		var allStrings = [];
-
 		
 	function generate() {
 		//gets input and adds possessive keyword to keywords array if it doesn't end in 's'
 		//adds space after
 		var keyword = document.getElementById("keyword").value;
 		keywordList = ["</br>" + keyword + " "];
-
 		if(keyword.slice(-1)!="s" && keyword.slice(-1)!="S"){
 			keywordList.push("</br>" + keyword + "'s ");
 			};
@@ -80,8 +73,6 @@
 		
 		//stores gametime array
 		var gametimeStrings = allStrings;
-
-
 		//finishes adding to allstrings for general phrases
 		allStrings = addGamenumbers();
 		allStrings = addIdentifiers();
@@ -105,10 +96,7 @@
 		//unhides copy button
 		document.getElementById("generalButton").style.visibility = "visible";
 		document.getElementById("gametimeButton").style.visibility = "visible";
-
 	};
-
-
 	//adds prefixes to keywords, returns new array
 	//no space before //determines space after(no if hashtag or empty)
 	function addPrefix(){
@@ -128,13 +116,12 @@
 		};
 		return(tempArray);
 	};
-
-
 	//adds gamewords, returns new array
-	//determines valid hashtag gamewords to use (those without a space)
+	//determines valid hashtag gamewords to use
 	//does not add space after gamewords to allow further hashtag construction
 	function addGamewords(){
 		var tempArray = [];
+		var potentialSpace = "";
 		
 		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
 			for (var i = 0; i < gamewordList.length; i++){
@@ -146,8 +133,6 @@
 		};
 		return(tempArray);
 	};
-
-
 	//adds gamenumbers to lines w/o 2019 or 'big', returns new array
 	//adds space before except when hashtag exists
 	//does not add space after 
@@ -174,8 +159,6 @@
 		};
 		return(tempArray);
 	};
-
-
 	//adds identifiers to allstrings, returns new array
 	//adds space before
 	function addIdentifiers(){
@@ -188,13 +171,10 @@
 		};
 		return(tempArray);
 	};
-
-
 	//creates unique string variation: "honda commercial in the superbowl"
 	function variation(){
 		var savedAllStrings = allStrings;
 		allStrings = keywordList;
-
 		//removes space after keyword	
 		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			allStrings[allIndex] = allStrings[allIndex].replace(/.$/, "");
@@ -209,7 +189,6 @@
 		Array.prototype.push.apply(allStrings, savedAllStrings);
 		return(allStrings);	
 	};
-
 	
 	//copies phrases to clipboard
 	function copyPhrases(element) {
@@ -220,7 +199,6 @@
 		copyStrings.style.visibility = "hidden";
 		alert("Copied " + element);
 	}
-
 	</script>
 
 </body>
