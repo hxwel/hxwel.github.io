@@ -109,7 +109,7 @@
 	};
 
 
-	//adds prefixes to keywords, returns new allstrings array
+	//adds prefixes to keywords, returns new array
 	//no space before //determines space after(no if hashtag or empty)
 	function addPrefix(){
 		var tempArray = [];
@@ -130,12 +130,11 @@
 	};
 
 
-	//adds gamewords, returns new allstrings array
-	//determines valid hashtag gamewords to use
+	//adds gamewords, returns new array
+	//determines valid hashtag gamewords to use (those without a space)
 	//does not add space after gamewords to allow further hashtag construction
 	function addGamewords(){
 		var tempArray = [];
-		var potentialSpace = "";
 		
 		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
 			for (var i = 0; i < gamewordList.length; i++){
@@ -149,7 +148,7 @@
 	};
 
 
-	//adds gamenumbers to lines w/o 2018 or 'big', returns new allstrings array
+	//adds gamenumbers to lines w/o 2019 or 'big', returns new array
 	//adds space before except when hashtag exists
 	//does not add space after 
 	function addGamenumbers(){
@@ -161,7 +160,7 @@
 			if(allStrings[allIndex].match(/big/)){
 				continue;
 			};
-			if(allStrings[allIndex].match(/2018/)){
+			if(allStrings[allIndex].match(/2019/)){
 				continue;
 			};
 			for (var i = 0; i < gameNumbers.length; i++){
@@ -177,7 +176,7 @@
 	};
 
 
-	//adds identifiers to allstrings, returns new allstrings array
+	//adds identifiers to allstrings, returns new array
 	//adds space before
 	function addIdentifiers(){
 		var tempArray = [];
