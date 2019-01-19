@@ -2,10 +2,21 @@
 
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>sb keyphraser</title>
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,600" rel="stylesheet">
+
 	<style>
 		body {
-		font-family: Sans-serif;
+		font-family: 'Source Sans Pro', sans-serif;
+		font-weight: 300;
+		}
+		button{
+		background-color: #77bd22;
+	  	border: none;
+	 	color: white;
+		height: 25px;
+		cursor: pointer;
 		}
 		.output {
 		padding: 15px;
@@ -14,48 +25,68 @@
 		.input {
 		float: left;
 		}
+		#keyword{
+		outline: none;
+		background-color: white;
+		box-sizing: border-box;
+		border: 1px solid #ccc;
+		width: 200px;
+		height: 25px;
+		}
+		/*gets rid of chrome's autofill yellow*/
+		input:-webkit-autofill,
+		input:-webkit-autofill:hover,
+		input:-webkit-autofill:focus,
+		input:-webkit-autofill:active {
+    	-webkit-box-shadow: 0 0 0 30px white inset !important;
+		}
 		#form {
 		padding: 15px;
 		}
 		.hidden {
 		visibility: hidden;
 		}
+		.titleText {
+			font-weight: 600;
+		}
+
 	</style>
 </head>
 <body>
 
 	<div id="form">
 		<form class="input" onsubmit="generate();return false" id="frm1">
-			keyword: <input id="keyword" type="text"><br>
-		</form> 
+			<input id="keyword" type="text" placeholder="keyword"><br>
+		</form>
 		<button class="input" onclick="generate();">generate</button>
 		</br>
 	</div>
 
-
-	<div class="output hidden" id="generalButton">
-		<strong>General Phrases</strong></br>
-		<button onclick="copyPhrases('generalPhrases')">Copy to Clipboard</button>
+	<div class="output hidden" id="specialButton">
+		<p class="titleText">Special Case Phrases</p>
+		<button onclick="copyPhrases('specialPhrases')">copy to clipboard</button>
 		<div id="results"></div>
 	</div>
 
-	<div class="output hidden" id="gametimeButton">
-		<strong>Gametime Phrases</strong></br>
-		<button onclick="copyPhrases('gametimePhrases')">Copy to Clipboard</button>
-		<div id="gametime"></div>
+	<div class="output hidden" id="generalButton">
+		<p class="titleText">General Phrases</p>
+		<button onclick="copyPhrases('generalPhrases')">copy to clipboard</button>
+		<div id="general"></div>
 	</div>
 
+	<textarea class="hidden" cols="30" value="" id="specialPhrases"></textarea>
 	<textarea class="hidden" cols="30" value="" id="generalPhrases"></textarea>
-	<textarea class="hidden" cols="30" value="" id="gametimePhrases"></textarea>
 
-	<script>
+	<script type="text/javascript">
 		var prefixList = ["#", "2019", ""];
 		var gamewordList = ["superbowl", "super bowl", "sb", "biggame", "big game"];
 		var gameNumbers = ["53", "liii"];
 		var identifierList = ["commercial", "ad"];
 		var keywordList = [];
 		var allStrings = [];
-		
+		var reverseStrings = [];
+
+
 	function generate() {
 		//gets input and adds possessive keyword to keywords array if it doesn't end in 's'
 		//adds space after
@@ -64,46 +95,56 @@
 		if(keyword.slice(-1)!="s" && keyword.slice(-1)!="S"){
 			keywordList.push("</br>" + keyword + "'s ");
 			};
-		
+
 		//light the fuse starting with keywords
 		allStrings = keywordList;
 		allStrings = addPrefix();
 		allStrings = addGamewords();
-		
-		
+
+
 		//stores gametime array
 		var gametimeStrings = allStrings;
-		//finishes adding to allstrings for general phrases
+
+		//adds reverse phrases to gametimeStrings
+		reverseStrings = reverse();
+		reverseStrings = addKeyword();
+		
+		//finishes adding to allstrings for special phrases
 		allStrings = addGamenumbers();
 		allStrings = addIdentifiers();
 		allStrings = variation();
-		
-		//converts to strings
+
+		//attaches reverseStrings to gametimeStrings (needs to be after allstrings is reset or it will append to allstrings also)
+		Array.prototype.push.apply(gametimeStrings, reverseStrings);
+
+		//converts both arrays to strings
 		var finalResult = allStrings.toString();
 		var gametimeResult = gametimeStrings.toString();
-		
+
 		//display strings on page
 		document.getElementById("results").innerHTML = finalResult;
-		document.getElementById("gametime").innerHTML = gametimeResult;
-		
+		document.getElementById("general").innerHTML = gametimeResult;
+
 		//remove breaks and put strings in a text field for copying
 		finalResult = finalResult.replace(/\<\/br\>/g,"");
-		document.getElementById("generalPhrases").value = finalResult;
-		
+		document.getElementById("specialPhrases").value = finalResult;
+
 		gametimeResult = gametimeResult.replace(/\<\/br\>/g,"");
-		document.getElementById("gametimePhrases").value = gametimeResult;
-		
+		document.getElementById("generalPhrases").value = gametimeResult;
+
 		//unhides copy button
+		document.getElementById("specialButton").style.visibility = "visible";
 		document.getElementById("generalButton").style.visibility = "visible";
-		document.getElementById("gametimeButton").style.visibility = "visible";
 	};
+
+
 	//adds prefixes to keywords, returns new array
 	//no space before //determines space after(no if hashtag or empty)
 	function addPrefix(){
 		var tempArray = [];
 		var potentialSpace = "";
-		
-		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
+
+		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			for (var i = 0; i < prefixList.length; i++){
 				if(prefixList[i]!="#" && prefixList[i]!=""){
 					potentialSpace=" ";
@@ -116,14 +157,16 @@
 		};
 		return(tempArray);
 	};
+
+
 	//adds gamewords, returns new array
 	//determines valid hashtag gamewords to use
 	//does not add space after gamewords to allow further hashtag construction
 	function addGamewords(){
 		var tempArray = [];
 		var potentialSpace = "";
-		
-		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
+
+		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			for (var i = 0; i < gamewordList.length; i++){
 				if(allStrings[allIndex].slice(-1)=="#" && (/\s/.test(gamewordList[i]))){
 					continue;
@@ -133,14 +176,16 @@
 		};
 		return(tempArray);
 	};
+
+
 	//adds gamenumbers to lines w/o 2019 or 'big', returns new array
 	//adds space before except when hashtag exists
-	//does not add space after 
+	//does not add space after
 	function addGamenumbers(){
 		var tempArray = [];
 		var potentialSpace = "";
-		
-		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
+
+		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			tempArray.push(allStrings[allIndex]);
 			if(allStrings[allIndex].match(/big/)){
 				continue;
@@ -153,43 +198,93 @@
 					potentialSpace = "";
 				}else{
 					potentialSpace = " ";
-				};	
+				};
 				tempArray.push(allStrings[allIndex] + potentialSpace + gameNumbers[i]);
 			};
 		};
 		return(tempArray);
 	};
+
+
 	//adds identifiers to allstrings, returns new array
 	//adds space before
 	function addIdentifiers(){
 		var tempArray = [];
-		
-		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){ 
+
+		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			for (var i = 0; i < identifierList.length; i++){
 				tempArray.push(allStrings[allIndex] + " " + identifierList[i]);
 			};
 		};
 		return(tempArray);
 	};
+
+
 	//creates unique string variation: "honda commercial in the superbowl"
 	function variation(){
 		var savedAllStrings = allStrings;
 		allStrings = keywordList;
-		//removes space after keyword	
+		//removes space after keyword
 		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			allStrings[allIndex] = allStrings[allIndex].replace(/.$/, "");
 		};
-		
+
 		allStrings = addIdentifiers();
-		
+
 		for(var i = 0; i < allStrings.length; i++){
 			allStrings[i] += " in the ";
 		};
 		allStrings = addGamewords();
 		Array.prototype.push.apply(allStrings, savedAllStrings);
-		return(allStrings);	
+		return(allStrings);
 	};
+
+
+	//creates reverse phrase variation and adds to gametimeStrings
+	//loops through each gameword, each having a special condition for adding game numbers and spaces
+
+	function reverse(){
+		var reverseList = gamewordList;
+		var tempArray = [];
+
+		for(var allIndex = 0; allIndex < reverseList.length; allIndex++){
+			tempArray.push(reverseList[allIndex] + " ");
+			for (var i = 0; i < gameNumbers.length; i++){
+				if(reverseList[allIndex].match(/big/)){
+					continue;
+				};
+				if(reverseList[allIndex].match(/sb/)) {
+					tempArray.push(reverseList[allIndex] + gameNumbers[i] + " ");
+				};
+				if(reverseList[allIndex].match(/superbowl/)){
+					tempArray.push(reverseList[allIndex] + " " + gameNumbers[i] + " ");
+					tempArray.push(reverseList[allIndex] + gameNumbers[i] + " ");
+				};
+				if(reverseList[allIndex].match(/super bowl/)){
+					tempArray.push(reverseList[allIndex] + " " + gameNumbers[i] + " ");
+				};
+			};
+		};
+		return(tempArray);
+	};
+
+
+	//adds line break and keyword to each element in reverseStrings and returns new array
+	function addKeyword(){
+		var tempArray = [];
+		for(var allIndex = 0; allIndex < reverseStrings.length; allIndex++){
+			tempArray.push("</br>" + reverseStrings[allIndex] + keyword.value);
+		};
+		return(tempArray);
+	};		
+			
+
+
+		
 	
+		
+
+
 	//copies phrases to clipboard
 	function copyPhrases(element) {
 		var copyStrings = document.getElementById(element);
@@ -199,6 +294,7 @@
 		copyStrings.style.visibility = "hidden";
 		alert("Copied " + element);
 	}
+
 	</script>
 
 </body>
