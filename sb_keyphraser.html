@@ -78,9 +78,49 @@
 	<textarea class="hidden" cols="30" value="" id="generalPhrases"></textarea>
 
 	<script type="text/javascript">
-		var prefixList = ["#", "2019", ""];
+		window.onload = getYear;
+
+	//gets current month and year, converts to super bowl year and runs roman number converter
+	function getYear(){
+		var today = new Date();
+		var thisMonth = today.getMonth();
+		var thisYear = today.getFullYear();
+
+		//checks to see if the current month is past superbowl (march) and adds a year if it is
+		//allows keyphraser to adjust for upcoming super bowl
+		if (thisMonth > 1){
+			thisYear = thisYear + 1;
+		};
+		return thisYear;
+	};
+
+	var thisYear = getYear();
+	var bowlNumber = thisYear-1966;
+	var	romanYear = toRoman(bowlNumber);
+
+	//converts any num to a roman numeral
+	//used for getting the current super bowl numeral
+	function toRoman(num) {  
+	  var result = '';
+	  var decimal = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+	  var roman = ["m", "cm","d","cd","c", "xc", "l", "xl", "x","ix","v","iv","i"];
+	  for (var i = 0;i<=decimal.length;i++) {
+	    // looping over every element of our arrays
+	    while (num%decimal[i] < num) {   
+	      // keep trying the same number until it won't fit anymore      
+	      result += roman[i];
+	      // add the matching roman number to our result string
+	      num -= decimal[i];
+	      // remove the decimal value of the roman number from our number
+	    };
+	  };
+	  return result;
+	};
+
+
+		var prefixList = ["#", thisYear, ""];
 		var gamewordList = ["superbowl", "super bowl", "sb", "biggame", "big game"];
-		var gameNumbers = ["53", "liii"];
+		var gameNumbers = [bowlNumber, romanYear];
 		var identifierList = ["commercial", "ad"];
 		var keywordList = [];
 		var allStrings = [];
@@ -240,9 +280,8 @@
 	};
 
 
-	//creates reverse phrase variation and adds to gametimeStrings
-	//loops through each gameword, each having a special condition for adding game numbers and spaces
-
+	//creates reverse phrase variation and returns new array
+	//loops through gamewords array, each having a special condition for adding gamenumbers and spaces
 	function reverse(){
 		var reverseList = gamewordList;
 		var tempArray = [];
@@ -278,10 +317,6 @@
 		return(tempArray);
 	};		
 			
-
-
-		
-	
 		
 
 
