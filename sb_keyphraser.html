@@ -55,14 +55,14 @@
 <body>
 
 	<div id="form">
-		<form class="input" onsubmit="generate();return false" id="frm1">
+		<form class="input" onsubmit="create();return false" id="frm1">
 			<input id="keyword" type="text" placeholder="keyword"><br>
 		</form>
-		<button class="input" onclick="generate();">generate</button>
+		<button class="input" onclick="create();">generate</button>
 		</br>
 	</div>
 
-	<div class="output hidden" id="specialButton">
+	<div class="output hidden" id="specialButton" style="display:none">
 		<p class="titleText">Special Case Phrases</p>
 		<button onclick="copyPhrases('specialPhrases')">copy to clipboard</button>
 		<div id="results"></div>
@@ -74,7 +74,7 @@
 		<div id="general"></div>
 	</div>
 
-	<textarea class="hidden" cols="30" value="" id="specialPhrases"></textarea>
+	<textarea class="hidden" cols="30" value="" id="specialPhrases" style="display:none"></textarea>
 	<textarea class="hidden" cols="30" value="" id="generalPhrases"></textarea>
 
 	<script type="text/javascript">
@@ -120,7 +120,7 @@
 
 		var prefixList = ["#", thisYear, ""];
 		var gamewordList = ["superbowl", "super bowl", "sb", "biggame", "big game"];
-		var gameNumbers = [bowlNumber, romanYear];
+		var gameNumbers = [bowlNumber, romanYear, "dog"];
 		var identifierList = ["commercial", "ad"];
 		var keywordList = [];
 		var allStrings = [];
@@ -186,7 +186,7 @@
 
 		for(var allIndex = 0; allIndex < allStrings.length; allIndex++){
 			for (var i = 0; i < prefixList.length; i++){
-				if(prefixList[i]!="#" && prefixList[i]!=""){
+				if(prefixList[i] != "#" && prefixList[i] != ""){
 					potentialSpace=" ";
 				}
 				else {
@@ -329,6 +329,90 @@
 		copyStrings.style.visibility = "hidden";
 		alert("Copied " + element);
 	}
+        
+        
+    ////////////////// boring/lazy version for 2021
+    
+    var ambiPhrases = [
+        "@Superbowl",
+        "superbowl",
+        "superbowl55",
+        "superbowllv",
+        "superbowl21",
+        "superbowl2021",
+        "super bowl",
+        "sb",
+        "sb55",
+        "sblv",
+        "biggame",
+        "big game"
+    ]
+    var leadingPhrases = [
+        "superbowl 55",
+        "super bowl 55",
+        "superbowl lv",
+        "super bowl lv",
+        "super bowl 21",
+        "super bowl 2021"
+    ]
+    var trailingPhrases = [
+        "#superbowl",
+        "#superbowl55",
+        "#superbowlLV",
+        "#superbowl21",
+        "#superbowl2021",
+        "#sb",
+        "#sblv",
+        "#biggame",
+        "2021 superbowl",
+        "2021 super bowl",
+        "2021 sb",
+        "2021 biggame",
+        "2021 big game",
+    ]
+    
+    function create() {
+        var finalPhraseList = [];
+        var keyword = document.getElementById("keyword").value;
+		var possessiveKeyword = "";
+		if(keyword.slice(-1)!="s" && keyword.slice(-1)!="S"){
+			possessiveKeyword = keyword + "'s";
+			};
+        
+        for (var i = 0; i < trailingPhrases.length; i++) {
+            finalPhraseList.push(keyword + " " + trailingPhrases[i]);
+        }
+        for (var i = 0; i < leadingPhrases.length; i++) {
+            finalPhraseList.push(leadingPhrases[i] + " " + keyword);
+        }
+        for (var i = 0; i < ambiPhrases.length; i++) {
+            finalPhraseList.push(keyword + " " + ambiPhrases[i]);
+            finalPhraseList.push(ambiPhrases[i] + " " + keyword);
+            if(possessiveKeyword) {
+                finalPhraseList.push(possessiveKeyword + " " + ambiPhrases[i]);
+                finalPhraseList.push(possessiveKeyword + " " + trailingPhrases[i]);
+            }
+        }
+        finalPhraseList.sort();
+        
+        for (var i = 0; i < finalPhraseList.length; i++) {
+            finalPhraseList[i] = "</br>" + finalPhraseList[i];
+        }
+        
+        	//converts both arrays to strings
+		var gameTimeResult = finalPhraseList.toString();
+
+		//display strings on page
+		document.getElementById("general").innerHTML = gameTimeResult;
+
+		//remove breaks and put strings in a text field for copying
+		gameTimeResult = gameTimeResult.replace(/\<\/br\>/g,"");
+		document.getElementById("generalPhrases").value = gameTimeResult;
+
+		//unhides copy button
+		document.getElementById("generalButton").style.visibility = "visible";
+    }
+    
 
 	</script>
 
